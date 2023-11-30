@@ -1,8 +1,6 @@
 package di
 
 import (
-	"log"
-
 	"github.com/shakezidin/config"
 	"github.com/shakezidin/pkg/db"
 	"github.com/shakezidin/pkg/handler"
@@ -17,8 +15,6 @@ func Init() {
 	userRepo := repo.NewUserRepository(db)
 	userServ := serv.NewUserService(userRepo)
 	userhandler := handler.NewUserHandler(userServ)
-	err := server.NewGrpcServer(config, userhandler)
-	if err != nil {
-		log.Fatalf("something went wrong", err)
-	}
+	adminhandler := handler.NewAdminHandler(userServ)
+	server.GrpcServerRun(config, userhandler, adminhandler)
 }

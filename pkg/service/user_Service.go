@@ -36,6 +36,14 @@ func (u *UserService) LoginService(pbuser *pb.LoginRequest) (*DOM.User, error) {
 	return user, nil
 }
 
+func (u *UserService) FetchAllSUserSvc() ([]*DOM.User, error) {
+	users, err := u.repo.FetchAllSUserRepo()
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func NewUserService(repos inter.UserRepositoryinter) interr.UserServiceInter {
 	return &UserService{
 		repo: repos,
