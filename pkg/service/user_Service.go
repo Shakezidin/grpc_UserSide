@@ -44,6 +44,19 @@ func (u *UserService) FetchAllSUserSvc() ([]*DOM.User, error) {
 	return users, nil
 }
 
+func (u *UserService) DeleteUserSvc(id uint64) (string, error) {
+	user, err := u.repo.FindUserbyId(id)
+	if err != nil {
+		return "usernot found", err
+	}
+
+	err=u.repo.DeleteUserById(user.ID)
+	if err != nil {
+		return "usernot found", err
+	}
+
+	return user.UserName, nil
+}
 func NewUserService(repos inter.UserRepositoryinter) interr.UserServiceInter {
 	return &UserService{
 		repo: repos,

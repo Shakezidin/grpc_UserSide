@@ -4,6 +4,7 @@ import (
 	"context"
 
 	adminpb "github.com/shakezidin/pkg/adminpb/pb"
+	pb "github.com/shakezidin/pkg/pb"
 	inter "github.com/shakezidin/pkg/service/interface"
 )
 
@@ -40,9 +41,42 @@ func (h *AdminHandler) FetchAllSUser(ctx context.Context, p *adminpb.FetchUsers)
 	return rslt, nil
 }
 
-func (h *AdminHandler)	DeleteUser(ctx context.Context,p *adminpb.DeleteUserById) (*adminpb.AdminResult, error){
+func (h *AdminHandler) CreateUser(ctx context.Context, p *adminpb.UserCreate) (*adminpb.AdminResult, error) {
+	user := &pb.SignupRequest{
+		Username: p.Username,
+		Name:     p.Name,
+		Email:    p.Email,
+		Password: p.Password,
+	}
+
+	_, err := h.svc.SignupService(user)
+	if err != nil {
+		return nil, err
+	}
+	reslt := &adminpb.AdminResult{
+		Status:  "Success",
+		Error:   "nil",
+		Message: "user created success",
+	}
+	return reslt, nil
+}
+
+func (h *AdminHandler) DeleteUser(ctx context.Context, p *adminpb.DeleteUserById) (*adminpb.AdminResult, error) {
+	username, err := h.svc.DeleteUserSvc(p.Id)
+	if err != nil {
+		return nil, err
+	}
+	rslt := adminpb.AdminResult{
+		Status:  "success",
+		Error:   "",
+		Message: username,
+	}
+	return &rslt, nil
+}
+
+func (h *AdminHandler)SearchUser(ctx context.Context,p *adminpb.UserRequest) (*adminpb.SearchResponse, error){
 	
 }
-// 	CreateUser(context.Context, *UserCreate) (*Result, error)
+
 // 	SearchUser(context.Context, *UserRequest) (*SearchResponse, error)
 // 	EditUser(context.Context, *Users) (*UserResponse, error)

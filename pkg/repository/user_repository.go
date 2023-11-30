@@ -36,6 +36,22 @@ func (u *UserRepository) FetchAllSUserRepo() ([]*DOM.User, error) {
 	return users, nil
 }
 
+func (u *UserRepository) FindUserbyId(id uint64) (*DOM.User, error) {
+	var user *DOM.User
+	if err := u.db.Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (u *UserRepository) DeleteUserById(id uint) error {
+	var user *DOM.User
+	if err := u.db.Where("id = ?", id).Delete(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewUserRepository(db *gorm.DB) inter.UserRepositoryinter {
 	return &UserRepository{
 		db: db,
