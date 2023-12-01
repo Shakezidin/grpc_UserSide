@@ -36,7 +36,7 @@ func (u *UserRepository) FetchAllSUserRepo() ([]*DOM.User, error) {
 	return users, nil
 }
 
-func (u *UserRepository) FindUserbyId(id uint64) (*DOM.User, error) {
+func (u *UserRepository) FindUserbyId(id uint) (*DOM.User, error) {
 	var user *DOM.User
 	if err := u.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
@@ -47,6 +47,21 @@ func (u *UserRepository) FindUserbyId(id uint64) (*DOM.User, error) {
 func (u *UserRepository) DeleteUserById(id uint) error {
 	var user *DOM.User
 	if err := u.db.Where("id = ?", id).Delete(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UserRepository) FindAllUserByUsername(username string) ([]*DOM.User, error) {
+	var users []*DOM.User
+	if err := u.db.Where("user_name ILIKE ?", "%"+username+"%").Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func (u *UserRepository) UpdateUser(user *DOM.User) error {
+	if err := u.db.Model(&DOM.User{}).Where("id = ?", user.ID).Updates(user).Error; err != nil {
 		return err
 	}
 	return nil

@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/shakezidin/pkg/DOM"
+	adminpb "github.com/shakezidin/pkg/adminpb/pb"
 	pb "github.com/shakezidin/pkg/pb"
 	inter "github.com/shakezidin/pkg/repository/interface"
 	interr "github.com/shakezidin/pkg/service/interface"
@@ -45,18 +46,42 @@ func (u *UserService) FetchAllSUserSvc() ([]*DOM.User, error) {
 }
 
 func (u *UserService) DeleteUserSvc(id uint64) (string, error) {
-	user, err := u.repo.FindUserbyId(id)
+	user, err := u.repo.FindUserbyId(uint(id))
 	if err != nil {
 		return "usernot found", err
 	}
 
-	err=u.repo.DeleteUserById(user.ID)
+	err = u.repo.DeleteUserById(user.ID)
 	if err != nil {
 		return "usernot found", err
 	}
 
 	return user.UserName, nil
 }
+
+func (u *UserService) SearchUserSvc(username string) ([]*DOM.User, error) {
+	users, err := u.repo.FindAllUserByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func (u *UserService) EditUserSvc(p *adminpb.Users) (*adminpb.UserResponse, error) {
+	user, err := u.repo.FindUserbyId(uint(p.Id))
+	if err != nil {
+		return nil, err
+	}
+	err = u.repo.UpdateUser(user)
+	if err != nil {
+		return nil, err
+	}
+	return &adminpb.UserResponse{
+		Status:   "Success",
+		Username: user.UserName,
+	}, nil
+}
+
 func NewUserService(repos inter.UserRepositoryinter) interr.UserServiceInter {
 	return &UserService{
 		repo: repos,

@@ -74,9 +74,32 @@ func (h *AdminHandler) DeleteUser(ctx context.Context, p *adminpb.DeleteUserById
 	return &rslt, nil
 }
 
-func (h *AdminHandler)SearchUser(ctx context.Context,p *adminpb.UserRequest) (*adminpb.SearchResponse, error){
-	
+func (h *AdminHandler) SearchUser(ctx context.Context, p *adminpb.UserRequest) (*adminpb.SearchResponse, error) {
+	userss, err := h.svc.SearchUserSvc(p.Username)
+	if err != nil {
+		return nil, err
+	}
+	var users []*adminpb.Users
+	for _, i := range userss {
+		users = append(users, &adminpb.Users{
+			Id:       uint64(i.ID),
+			Username: i.UserName,
+			Name:     i.Name,
+			Email:    i.Email,
+			Password: i.Password,
+		})
+	}
+	rslt := &adminpb.SearchResponse{
+		Status:    "Success",
+		Available: users,
+	}
+	return rslt, nil
 }
 
-// 	SearchUser(context.Context, *UserRequest) (*SearchResponse, error)
-// 	EditUser(context.Context, *Users) (*UserResponse, error)
+func (h *AdminHandler) EditUser(ctx context.Context, p *adminpb.Users) (*adminpb.UserResponse, error) {
+	result, err := h.svc.EditUserSvc(p)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
